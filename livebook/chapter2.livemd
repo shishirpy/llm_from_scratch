@@ -1,0 +1,98 @@
+# Untitled notebook
+
+```elixir
+Mix.install([
+  {:req, "~> 0.5.15"}
+])
+```
+
+## Section
+
+```elixir
+File.cd("/Users/shishirpy/Documents/github/llm_from_scratch/livebook")
+```
+
+```elixir
+url = "https://raw.githubusercontent.com/rasbt/LLMs-from-scratch/main/ch02/01_main-chapter-code/the-verdict.txt"
+{:ok, %Req.Response{status: status, body: body}} = Req.get(url)
+File.write("the-verdict.txt", body)
+
+```
+
+```elixir
+data = File.read!("the-verdict.txt")
+
+IO.puts("Total number of characters:, #{String.length(data)}")
+IO.puts(String.slice(data, 0, 99))
+
+```
+
+<!-- livebook:{"branch_parent_index":0} -->
+
+## Tokenization Experiments
+
+Test regular expression to split text.
+
+```elixir
+text = "Hello, world. This, is a test."
+Regex.split(~r/\s/, text, [include_captures: true])
+```
+
+Let's remove the punctuation that is attached with the words.
+
+```elixir
+Regex.split(~r/[,.]|\s/, text, [include_captures: true])
+```
+
+Remove empty strings
+
+```elixir
+Regex.split(~r/[,.]|\s/, text, [include_captures: true, trim: true])
+|> Enum.map(&String.trim(&1))
+|> Enum.filter(fn x -> String.length(x) > 0 end)
+```
+
+```elixir
+Regex.split(~r/[,.]|\s/, text, [include_captures: true, trim: true])
+|> Stream.map(&String.trim(&1))
+|> Stream.filter(fn x -> String.length(x) > 0 end)
+|> Enum.to_list
+```
+
+<!-- livebook:{"branch_parent_index":0} -->
+
+## Tokenization on the data
+
+```elixir
+# Enum Version 
+
+Regex.split(~r/[,.:;?_!"()\']|--|\s/, data, [include_captures: true, trim: true])
+|> Enum.map(&String.trim(&1))
+|> Enum.filter(fn x -> String.length(x) > 0 end)
+```
+
+```elixir
+# Stream Version 
+
+preprocessed = Regex.split(~r/[,.:;?_!"()\']|--|\s/, data, [include_captures: true, trim: true])
+  |> Stream.map(&String.trim(&1))
+  |> Stream.filter(fn x -> String.length(x) > 0 end)
+  |> Enum.to_list
+```
+
+```elixir
+all_words = preprocessed
+  |> MapSet.new()
+  |> Enum.sort()
+
+"Vocabulary Size: #{length(all_words)}"
+```
+
+```elixir
+vocab =Enum.with_index(all_words)
+  |> Enum.into(%{})
+```
+
+```elixir
+Enum.slice(vocab, 0, 50)
+```
