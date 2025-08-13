@@ -1,6 +1,6 @@
-# LlmFromScratch
+# LLM From Scratch
 
-**TODO: Add description**
+Elixir code based on the book - `Build a Large Language Model (From Scratch)`.
 
 ## Installation
 

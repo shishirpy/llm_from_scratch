@@ -13,9 +13,9 @@ File.cd("/Users/shishirpy/Documents/github/llm_from_scratch/livebook")
 ```
 
 ```elixir
-url = "https://raw.githubusercontent.com/rasbt/LLMs-from-scratch/main/ch02/01_main-chapter-code/the-verdict.txt"
-{:ok, %Req.Response{status: status, body: body}} = Req.get(url)
-File.write("the-verdict.txt", body)
+# url = "https://raw.githubusercontent.com/rasbt/LLMs-from-scratch/main/ch02/01_main-chapter-code/the-verdict.txt"
+# {:ok, %Req.Response{status: status, body: body}} = Req.get(url)
+# File.write("the-verdict.txt", body)
 
 ```
 
@@ -39,6 +39,10 @@ Regex.split(~r/\s/, text, [include_captures: true])
 ```
 
 Let's remove the punctuation that is attached with the words.
+
+```elixir
+String.split(text, ~r/[,.]|\s/, [include_captures: true])
+```
 
 ```elixir
 Regex.split(~r/[,.]|\s/, text, [include_captures: true])
@@ -82,10 +86,30 @@ preprocessed = Regex.split(~r/[,.:;?_!"()\']|--|\s/, data, [include_captures: tr
 
 ```elixir
 all_words = preprocessed
-  |> MapSet.new()
+  |> Enum.uniq()
   |> Enum.sort()
 
-"Vocabulary Size: #{length(all_words)}"
+# "Vocabulary Size: #{length(all_words)}"
+```
+
+```elixir
+data
+  |> String.split(~r/[,.:;?_!"()\']|--|\s/, [include_captures: true, trim: true])
+  |> Stream.map(&String.trim/1)
+  |> Enum.reject(&(&1 == ""))
+  |> Enum.uniq()
+  |> Enum.sort()
+    
+```
+
+```elixir
+data
+    |> String.split(~r/[,.:;?_!"()\']|--|\s/)
+    |> Stream.map(&String.trim/1)
+    |> Stream.reject(&(&1 == ""))
+    |> Enum.uniq()
+    |> Enum.sort()
+    |> Enum.with_index()
 ```
 
 ```elixir
